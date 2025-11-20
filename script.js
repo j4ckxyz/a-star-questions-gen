@@ -34,13 +34,13 @@ function generateLocalGraph(difficulty) {
     for (let i = 1; i < nodeCount - 1; i++) {
         let label = labels[i];
         let safe = false;
-        while (!safe && attempts < 1000) {
+        while (!safe && attempts < 2000) {
             attempts++;
             let x = 150 + Math.random() * (width - 300);
-            let y = 50 + Math.random() * (height - 100);
+            let y = 80 + Math.random() * (height - 160); // Keep away from extreme edges
 
-            // Check collision
-            let collision = placed.some(n => Math.sqrt(Math.pow(n.x - x, 2) + Math.pow(n.y - y, 2)) < 80);
+            // Check collision - Increased radius to 110 for better spacing
+            let collision = placed.some(n => Math.sqrt(Math.pow(n.x - x, 2) + Math.pow(n.y - y, 2)) < 110);
 
             if (!collision) {
                 nodes[label] = { x, y, h: 0, color: '#f3f4f6' };
@@ -56,6 +56,17 @@ function generateLocalGraph(difficulty) {
         const d = Math.sqrt(Math.pow(nodes[key].x - nodes['Z'].x, 2) + Math.pow(nodes[key].y - nodes['Z'].y, 2));
         // Scale down to simplified integer units (pixels / 40 approx)
         nodes[key].h = Math.floor(d / 40);
+    }
+
+    // Helper: Distance from point p to line segment v-w
+    function distToSegment(p, v, w) {
+        const l2 = Math.pow(v.x - w.x, 2) + Math.pow(v.y - w.y, 2);
+        if (l2 === 0) return Math.sqrt(Math.pow(p.x - v.x, 2) + Math.pow(p.y - v.y, 2));
+        let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        const projX = v.x + t * (w.x - v.x);
+        const projY = v.y + t * (w.y - v.y);
+        return Math.sqrt(Math.pow(p.x - projX, 2) + Math.pow(p.y - projY, 2));
     }
 
     // 3. Create Edges
@@ -80,20 +91,35 @@ function generateLocalGraph(difficulty) {
         let connections = Math.floor(Math.random() * 2) + 1;
         if (difficulty === 'hard') connections += 1;
 
-        for (let j = 0; j < Math.min(connections, neighbors.length); j++) {
+        for (let j = 0; j < Math.min(connections + 2, neighbors.length); j++) { // Check a few more neighbors
             let v = neighbors[j];
+
+            // Stop if we have enough connections
+            let currentConnections = edges.filter(e => e.from === u || e.to === u).length;
+            if (currentConnections >= connections) break;
 
             // Prevent dupes
             let edgeKey = [u, v].sort().join('-');
-            if (!edgeKeys.has(edgeKey)) {
-                // Weight = Distance + Random variation (but >= Distance to enable A*)
-                // For A* practice, we often make weight slightly higher than pure euclidean
-                let d = Math.floor(Math.sqrt(Math.pow(nodes[u].x - nodes[v].x, 2) + Math.pow(nodes[u].y - nodes[v].y, 2)) / 40);
-                let weight = Math.max(1, d + Math.floor(Math.random() * 3));
+            if (edgeKeys.has(edgeKey)) continue;
 
-                edges.push({ from: u, to: v, weight: weight });
-                edgeKeys.add(edgeKey);
+            // CHECK: Does this edge cross too close to another node?
+            let intersection = false;
+            for (let k in nodes) {
+                if (k === u || k === v) continue;
+                if (distToSegment(nodes[k], nodes[u], nodes[v]) < 45) { // 45px clearance
+                    intersection = true;
+                    break;
+                }
             }
+            if (intersection) continue;
+
+            // Weight = Distance + Random variation (but >= Distance to enable A*)
+            // For A* practice, we often make weight slightly higher than pure euclidean
+            let d = Math.floor(Math.sqrt(Math.pow(nodes[u].x - nodes[v].x, 2) + Math.pow(nodes[u].y - nodes[v].y, 2)) / 40);
+            let weight = Math.max(1, d + Math.floor(Math.random() * 3));
+
+            edges.push({ from: u, to: v, weight: weight });
+            edgeKeys.add(edgeKey);
         }
     }
 
