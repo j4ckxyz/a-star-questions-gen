@@ -271,7 +271,7 @@ function drawNode(id, x, y, h, color) {
 
 // --- 3. Table & Utils ---
 
-function updateTable() {
+function updateTable(solution = null) {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
 
@@ -286,14 +286,26 @@ function updateTable() {
 
     keys.forEach(key => {
         const node = currentGraphData.nodes[key];
+        let g = key === 'S' ? '0' : '∞';
+        let f = key === 'S' ? node.h : '∞';
+        let prev = key === 'S' ? '-' : '';
+        let visited = 'No';
+
+        if (solution && solution[key]) {
+            g = solution[key].g;
+            f = solution[key].f;
+            prev = solution[key].parent || '-';
+            visited = solution[key].visited ? 'Yes' : 'No';
+        }
+
         const row = `
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${key}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${key === 'S' ? '0' : '∞'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${g}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold text-red-600">${node.h}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${key === 'S' ? node.h : '∞'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${key === 'S' ? '-' : ''}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${f}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${prev}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${visited}</td>
             </tr>
         `;
         tbody.innerHTML += row;
@@ -351,6 +363,63 @@ function showToast() {
     setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-20');
     }, 2000);
+}
+
+// --- 4. A* Solver ---
+
+function solveAStar() {
+    const nodes = currentGraphData.nodes;
+    const edges = currentGraphData.edges;
+
+    // Initialize state
+    let state = {};
+    for (let k in nodes) {
+        state[k] = { g: Infinity, f: Infinity, parent: null, visited: false };
+    }
+    state['S'].g = 0;
+    state['S'].f = nodes['S'].h;
+
+    let openSet = ['S'];
+    let closedSet = new Set();
+
+    while (openSet.length > 0) {
+        // Get node with lowest f
+        openSet.sort((a, b) => state[a].f - state[b].f);
+        let current = openSet.shift();
+
+        state[current].visited = true;
+        closedSet.add(current);
+
+        if (current === 'Z') break; // Reached goal
+
+        // Get neighbors
+        let neighbors = edges.filter(e => e.from === current).map(e => ({ id: e.to, weight: e.weight }))
+            .concat(edges.filter(e => e.to === current).map(e => ({ id: e.from, weight: e.weight })));
+
+        for (let neighbor of neighbors) {
+            if (closedSet.has(neighbor.id)) continue;
+
+            let tentativeG = state[current].g + neighbor.weight;
+
+            if (tentativeG < state[neighbor.id].g) {
+                state[neighbor.id].parent = current;
+                state[neighbor.id].g = tentativeG;
+                state[neighbor.id].f = tentativeG + nodes[neighbor.id].h;
+
+                if (!openSet.includes(neighbor.id)) {
+                    openSet.push(neighbor.id);
+                }
+            }
+        }
+    }
+    return state;
+}
+
+function showAnswer() {
+    if (confirm("Are you sure you want to see the answer? This is for checking your work.")) {
+        const solution = solveAStar();
+        updateTable(solution);
+    }
 }
 
 // Initialize

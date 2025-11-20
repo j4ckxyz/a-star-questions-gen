@@ -76,15 +76,26 @@
         <div class="space-y-3 pt-4 border-t">
             <div class="flex justify-between items-end">
                 <h2 class="text-lg font-semibold text-gray-700">Worksheet Table</h2>
-                <button onclick="copyTableMarkdown()"
-                    class="text-gray-600 hover:text-green-600 text-sm font-medium flex items-center gap-1 hover:bg-green-50 px-3 py-1 rounded transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                    </svg>
-                    Copy Markdown for Notion
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="showAnswer()"
+                        class="text-gray-600 hover:text-purple-600 text-sm font-medium flex items-center gap-1 hover:bg-purple-50 px-3 py-1 rounded transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Show Answer
+                    </button>
+                    <button onclick="copyTableMarkdown()"
+                        class="text-gray-600 hover:text-green-600 text-sm font-medium flex items-center gap-1 hover:bg-green-50 px-3 py-1 rounded transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                        Copy Markdown for Notion
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto border rounded-lg">
