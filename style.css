@@ -1,0 +1,13 @@
+body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+.canvas-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
+canvas { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); width: 100% !important; height: auto !important; }
+.loader {
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #3b82f6;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

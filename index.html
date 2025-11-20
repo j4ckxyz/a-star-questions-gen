@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Star Question Generator</title>
+    <meta name="description"
+        content="Generate random graphs to practice Dijkstra & A* algorithms. Perfect for students and educators.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://astar.pages.dev/">
+    <meta property="og:title" content="A Star Question Generator">
+    <meta property="og:description" content="Generate random graphs to practice Dijkstra & A* algorithms.">
+    <meta property="og:image" content="https://astar.pages.dev/favicon.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://astar.pages.dev/">
+    <meta property="twitter:title" content="A Star Question Generator">
+    <meta property="twitter:description" content="Generate random graphs to practice Dijkstra & A* algorithms.">
+    <meta property="twitter:image" content="https://astar.pages.dev/favicon.png">
+
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
+
+    <div class="max-w-4xl w-full bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+
+        <!-- Header & Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">A* Algorithm Practice</h1>
+                <p class="text-sm text-gray-500 mt-1">Generate random graphs to practice Dijkstra & A*</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 bg-gray-50 p-3 rounded-lg border">
+                <select id="difficulty"
+                    class="bg-white border border-gray-300 text-gray-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <option value="easy">Easy (5-6 Nodes)</option>
+                    <option value="hard">Hard (8-10 Nodes)</option>
+                </select>
+
+                <button onclick="generateGraph()" id="genBtn"
+                    class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-2.5 flex items-center gap-2 transition-colors">
+                    <span id="btnIcon">✨</span>
+                    <span id="btnText">Generate New Map</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas Section -->
+        <div class="space-y-3">
+            <div class="flex justify-between items-end">
+                <h2 class="text-lg font-semibold text-gray-700">Graph View</h2>
+                <button onclick="copyCanvas()"
+                    class="text-gray-600 hover:text-blue-600 text-sm font-medium flex items-center gap-1 hover:bg-blue-50 px-3 py-1 rounded transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Image
+                </button>
+            </div>
+            <div class="canvas-container">
+                <canvas id="graphCanvas" width="800" height="500" class="w-full h-auto"></canvas>
+            </div>
+        </div>
+
+        <!-- Worksheet Section -->
+        <div class="space-y-3 pt-4 border-t">
+            <div class="flex justify-between items-end">
+                <h2 class="text-lg font-semibold text-gray-700">Worksheet Table</h2>
+                <button onclick="copyTableMarkdown()"
+                    class="text-gray-600 hover:text-green-600 text-sm font-medium flex items-center gap-1 hover:bg-green-50 px-3 py-1 rounded transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                    Copy Markdown for Notion
+                </button>
+            </div>
+
+            <div class="overflow-x-auto border rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200" id="worksheetTable">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Node</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Dist from Start (g)</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Heuristic (h)</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total (f = g + h)</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Previous Node</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Visited?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="tableBody">
+                        <!-- JS will populate this -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        Copied to clipboard!
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
