@@ -2,6 +2,8 @@
 
 A simple web application to generate random graph problems for practicing Dijkstra's Algorithm and A* Search Algorithm.
 
+**Live Demo:** [https://a-star-gen.pages.dev/](https://a-star-gen.pages.dev/)
+
 ## Features
 
 - **Random Graph Generation**: Generates connected graphs with random nodes and edge weights.

@@ -331,13 +331,13 @@ function copyTableMarkdown() {
         return a.localeCompare(b);
     });
 
-    let md = '| Node | Dist from Start ($g$) | Heuristic ($h$) | Total ($f = g + h$) | Previous Node | Visited? |\\n';
+    let md = '| Node | Dist from Start (g) | Heuristic (h) | Total (f = g + h) | Previous Node | Visited? |\\n';
     md += '| :--- | :--- | :--- | :--- | :--- | :--- |\\n';
 
     keys.forEach(k => {
         const h = currentGraphData.nodes[k].h;
-        const g = k === 'S' ? '0' : '$\\infty$';
-        const f = k === 'S' ? h : '$\\infty$';
+        const g = k === 'S' ? '0' : '∞';
+        const f = k === 'S' ? h : '∞';
         const prev = k === 'S' ? '-' : ' ';
         md += `| ${k} | ${g} | ${h} | ${f} | ${prev} | No |\\n`;
     });
