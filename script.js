@@ -104,6 +104,63 @@ function generateLocalGraph(difficulty) {
         edges.push({ from: 'S', to: closest, weight: d });
     }
 
+    // 4. Ensure Full Connectivity (Connect Components)
+    // Repeatedly connect the main component (starting at S) to the closest disconnected node
+    while (true) {
+        // BFS to find all reachable nodes from S
+        let reachable = new Set(['S']);
+        let queue = ['S'];
+        while (queue.length > 0) {
+            let u = queue.shift();
+            edges.forEach(e => {
+                if (e.from === u && !reachable.has(e.to)) {
+                    reachable.add(e.to);
+                    queue.push(e.to);
+                }
+                if (e.to === u && !reachable.has(e.from)) {
+                    reachable.add(e.from);
+                    queue.push(e.from);
+                }
+            });
+        }
+
+        // If all nodes are reachable, we are done
+        const allNodes = Object.keys(nodes);
+        if (reachable.size === allNodes.length) break;
+
+        // Find unreachable nodes
+        let unreachable = allNodes.filter(n => !reachable.has(n));
+
+        // Find closest pair (u, v) where u is reachable, v is unreachable
+        let bestEdge = null;
+        let minDist = Infinity;
+
+        reachable.forEach(u => {
+            unreachable.forEach(v => {
+                let d = Math.sqrt(Math.pow(nodes[u].x - nodes[v].x, 2) + Math.pow(nodes[u].y - nodes[v].y, 2));
+                if (d < minDist) {
+                    minDist = d;
+                    bestEdge = { u, v };
+                }
+            });
+        });
+
+        // Connect them
+        if (bestEdge) {
+            let u = bestEdge.u;
+            let v = bestEdge.v;
+            let d = Math.floor(minDist / 40);
+            let weight = Math.max(1, d + Math.floor(Math.random() * 2)); // Minimal random variation
+
+            // Ensure weight >= heuristic difference for consistency (though not strictly required for connectivity, good for A*)
+            // But here we just want to connect.
+
+            edges.push({ from: u, to: v, weight: weight });
+        } else {
+            break; // Should not happen if nodes exist
+        }
+    }
+
     return { nodes, edges };
 }
 
