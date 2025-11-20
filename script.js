@@ -292,15 +292,19 @@ function updateTable(solution = null) {
         let visited = 'No';
 
         if (solution && solution[key]) {
-            g = solution[key].g;
-            f = solution[key].f;
+            g = solution[key].g === Infinity ? '∞' : solution[key].g;
+            f = solution[key].f === Infinity ? '∞' : solution[key].f;
             prev = solution[key].parent || '-';
             visited = solution[key].visited ? 'Yes' : 'No';
         }
 
+        let label = key;
+        if (key === 'S') label += ' <span class="text-xs text-blue-600 font-bold">(Start)</span>';
+        if (key === 'Z') label += ' <span class="text-xs text-green-600 font-bold">(Goal)</span>';
+
         const row = `
             <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${key}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${label}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${g}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold text-red-600">${node.h}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${f}</td>
